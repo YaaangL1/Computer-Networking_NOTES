@@ -26,7 +26,7 @@ while True:
         那么处理之后的结果为：
         ['GET', '/HelloWorld.html', 'HTTP/1.1', 'Host:', '10.20.186.248:6789']
         '''
-        resourceFolder = "source"
+        resourceFolder = "resource"
         path = resourceFolder.encode() + filename
         f = open(path)
         outputdata = f.read()
