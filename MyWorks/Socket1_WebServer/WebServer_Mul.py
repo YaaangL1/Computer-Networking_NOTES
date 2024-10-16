@@ -2,6 +2,7 @@
 # http://10.16.60.43:6789/HelloWorld.html
 # import socket module
 import threading
+import traceback
 from socket import *
 
 
@@ -16,21 +17,25 @@ def handle_server(connectionSocket):
         message = connectionSocket.recv(1024)  # 获取客户发送的报文, 1024是接收的最大字节数
         filename = message.split()[1]  # 获取请求的文件名
         resourceFolder = "resource"
-        path = resourceFolder.encode() + filename
+        path = resourceFolder + filename.decode()
 
         f = open(path)
         outputdata = f.read()
 
         # Send one HTTP header line into socket
-        header = 'HTTP/1.1 200 OK\nConnection: close\nContent-Type: text/html\nContent-Length: %d\n\n' % (
+        header = 'HTTP/1.1 200 OK\nConnection: close\nContent-Type: text/html\nContent-Length: %d\r\n\r\n' % (
             len(outputdata))
-        connectionSocket.send(header.encode())
 
-        # Send the content of the requested file to the client
-        for i in range(0, len(outputdata)):
-            connectionSocket.send(outputdata[i].encode())
+        responses = header.encode() + outputdata.encode()
+        connectionSocket.send(responses)
+
+
         connectionSocket.close()
     except IOError:
+        # Print detailed error information
+        print("Error opening file:")
+        traceback.print_exc()
+
         # Send response message for file not found
         header = 'HTTP/1.1 404 Not Found'
         connectionSocket.send(header.encode())
